@@ -36,19 +36,15 @@ void Process(List<int> data)
 
 serial.DataReceived += (sender, eventArgs) =>
 {
-
-    //Console.WriteLine(Convert.ToString(((byte)(serial.ReadByte() << 4)) >> 4,2).PadLeft(8, '0'));
-    //Console.WriteLine(Convert.ToString(serial.ReadByte() , 2).PadLeft(8, '0'));
     var b = serial.ReadByte();
     var index = b >> 4;
     var data = b & 0x0f;
     buffer.Add(data);
     if (endOfTheStream != index) return;
     Process(buffer);
-    //buffer.ForEach(Console.Write);
     buffer.Clear();
-    //Console.WriteLine($"{Convert.ToString(data , 2).PadLeft(8, '0')}:{index}");
 };
+
 serial.Open();
 Console.ReadLine();
 
@@ -68,78 +64,4 @@ int SevenSegmentToDecimal(SevenSegment sevenSegment)
         _ => 0
     };
     return i;
-}
-
-[Flags]
-public enum First
-{
-    RS232 = 1 << 0,
-    AUTD = 1 << 1,
-    DC = 1 << 2,
-    AC = 1 << 3
-}
-
-[Flags]
-public enum SevenSegment
-{
-    None = 0,
-    a = 1 << 0,
-    f = 1 << 1,
-    e = 1 << 2,
-    decimalPoint = 1 << 3,
-    b = 1 << 4,
-    g = 1 << 5, 
-    c = 1 << 6,
-    d = 1 << 7
-}
-
-[Flags]
-public enum Ax
-{
-    None = 0,
-    Diode = 1 << 0,
-    k = 1 << 1,
-    n = 1 << 2,
-    u = 1 << 3
-}
-
-
-[Flags]
-public enum Bx
-{
-    None = 0,
-    Beep = 1 << 0,
-    M = 1 << 1,
-    Percent = 1 << 2,
-    m = 1 << 3
-}
-
-[Flags]
-public enum Cx
-{
-    None = 0,
-    Hold = 1 << 0,
-    Rel = 1 << 1,
-    Ohm = 1 << 2,
-    F = 1 << 3
-}
-
-[Flags]
-public enum Dx
-{
-    None = 0,
-    Battery = 1 << 0,
-    Hz = 1 << 1,
-    V = 1 << 2,
-    A = 1 << 3
-}
-
-[Flags]
-public enum Ex
-{
-    None = 0,
-    Empty = 1 << 0,
-    Celsius = 1 << 1,
-    mV = 1 << 2,
-    Unknown = 1 << 3
 }
