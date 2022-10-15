@@ -1,7 +1,14 @@
 ﻿using System.IO.Ports;
+using maxwell_dmm;
+
+// Set up logger. 
+Logger.SetLogger();
+
 
 var serial = new SerialPort();
+var Nlogger = NLog.LogManager.GetCurrentClassLogger();
 
+Nlogger.Info("The app has started. Trying to connect to the device.");
 serial.PortName = "COM3";
 serial.BaudRate = 2400;
 serial.Parity = Parity.None;
@@ -30,7 +37,21 @@ void Process(List<int> data)
     Console.Write((Dx)data[12] != Dx.None ? (Dx)data[12] : "");
     Console.Write((Ex)(data[13] & 0x6) != Ex.None ? (Ex)(data[13] & 0x6) : "");
 
+    string toLog = $"{(First)data[0]} {((data[1] & 0x8) == 0x8 ? '-' : '+')}" +
+        $"{SevenSegmentToDecimal((SevenSegment)(data[2] << 4 | data[1] & 0x7))}" +
+        $"{(((SevenSegment)data[3]).HasFlag(SevenSegment.decimalPoint) ? "." : "")}" +
+        $"{SevenSegmentToDecimal((SevenSegment)(data[4] << 4 | data[3] & 0x7))}" +
+        $"{(((SevenSegment)data[5]).HasFlag(SevenSegment.decimalPoint) ? "." : "")}" +
+        $"{(SevenSegmentToDecimal((SevenSegment)(data[6] << 4 | data[5] & 0x7)))}" +
+        $"{(((SevenSegment)data[7]).HasFlag(SevenSegment.decimalPoint) ? "." : "")}" +
+        $"{(SevenSegmentToDecimal((SevenSegment)(data[8] << 4 | data[7] & 0x7)))} " +
+        $"{((Ax)data[9] != Ax.None ? (Ax)data[9] : "")}" +
+        $"{((Bx)data[10] != Bx.None ? (Bx)data[10] : "")}" +
+        $"{((Cx)data[11] != Cx.None ? (Cx)data[11] : "")}" +
+        $"{((Dx)data[12] != Dx.None ? (Dx)data[12] : "")}" +
+        $"{((Ex)(data[13] & 0x6) != Ex.None ? (Ex)(data[13] & 0x6) : "")}";
 
+    Nlogger.Info(toLog);
 }
 
 
